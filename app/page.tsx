@@ -13,6 +13,7 @@ import {
 } from "firebase/storage";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import type { FirebaseError } from "firebase/app";
+import LatestNewsSection, { NewsItem } from "@/components/LatestNewsSection";
 
 type ServerTimestamp = ReturnType<typeof serverTimestamp>;
 type PostDoc = { title: string; content: string; imageUrl?: string | null; created: Timestamp | ServerTimestamp; uid: string; };
@@ -67,6 +68,16 @@ export default function Home() {
     const [progress, setProgress] = useState<number>(0);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const newsItems = useMemo<NewsItem[]>(() =>
+        posts.slice(0, 6).map((p, idx) => ({
+            id: idx + 1,
+            title: p.title,
+            date: safeDate(p.created as Timestamp | null),
+            category: "Post",
+            imageUrl: p.imageUrl || `https://source.unsplash.com/random/800x800?news,${idx}`,
+        })),
+        [posts]);
 
     useEffect(() => onAuthStateChanged(auth, setUser), []);
 
@@ -172,6 +183,10 @@ export default function Home() {
                         {error && <span className="text-sm text-red-600">{error}</span>}
                     </div>
                 </form>
+            )}
+
+            {newsItems.length > 0 && (
+                <LatestNewsSection items={newsItems} />
             )}
 
             <ul className="divide-y space-y-8">

@@ -6,6 +6,7 @@ import { firestore, auth, storage } from "@/firebase";
 import {
     collection, addDoc, onSnapshot, query, orderBy,
     serverTimestamp, FirestoreDataConverter, Timestamp, QueryDocumentSnapshot,
+    doc, getDoc,
 } from "firebase/firestore";
 import {
     ref, uploadBytesResumable, getDownloadURL, type UploadMetadata,
@@ -59,6 +60,7 @@ async function uploadImageOrThrow(file: File, uid: string, onProgress?: (pct: nu
 export default function Home() {
     const [user, setUser] = useState<User | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
+    const [profiles, setProfiles] = useState<Record<string, { avatarUrl?: string | null }>>({});
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [image, setImage] = useState<File | null>(null);
@@ -76,6 +78,23 @@ export default function Home() {
             (err) => { console.error("[snapshot]", err); setError("Failed to load posts."); }
         );
     }, []);
+
+    useEffect(() => {
+        const uids = Array.from(new Set([
+            ...posts.map(p => p.uid),
+            ...(user ? [user.uid] : []),
+        ]));
+        uids.forEach(uid => {
+            if (!profiles[uid]) {
+                getDoc(doc(firestore, "users", uid))
+                    .then(snap => snap.exists() && setProfiles(prev => ({
+                        ...prev,
+                        [uid]: { avatarUrl: (snap.data() as any).avatarUrl || null },
+                    })))
+                    .catch(err => console.error("[profile]", err));
+            }
+        });
+    }, [posts, user]);
 
     const canSubmit = useMemo(() => !!user && title.trim() && content.trim() && !submitting,
         [user, title, content, submitting]);
@@ -117,8 +136,16 @@ export default function Home() {
         <main className="max-w-3xl mx-auto px-6 py-8 space-y-8">
             <header className="flex justify-between items-center pb-4 border-b">
                 <h1 className="text-3xl font-bold">Minimal Blog</h1>
-                {user ? <button onClick={signOutUser}>Sign out</button>
-                    : <Link href="/login">Login</Link>}
+                {user ? (
+                    <div className="flex items-center gap-3">
+                        {profiles[user.uid]?.avatarUrl && (
+                            <img src={profiles[user.uid]!.avatarUrl!} alt="avatar" className="w-8 h-8 rounded-full" />
+                        )}
+                        <button onClick={signOutUser} className="underline">Sign out</button>
+                    </div>
+                ) : (
+                    <Link href="/login">Login</Link>
+                )}
             </header>
 
             {!user && <p>New here? <Link href="/register" className="underline">Register</Link></p>}
@@ -139,7 +166,7 @@ export default function Home() {
                         <progress value={progress} max={100} className="w-full">{progress}%</progress>
                     )}
                     <div className="flex items-center gap-2">
-                        <button disabled={!canSubmit} className={`px-4 py-2 text-white ${canSubmit ? "bg-black" : "bg-gray-400 cursor-not-allowed"}`}>
+                        <button disabled={!canSubmit} className={`px-4 py-2 text-white ${canSubmit ? "bg-[var(--accent-color)]" : "bg-gray-400 cursor-not-allowed"}`}>
                             {submitting ? "Adding..." : "Add Post"}
                         </button>
                         {error && <span className="text-sm text-red-600">{error}</span>}
@@ -150,10 +177,15 @@ export default function Home() {
             <ul className="divide-y space-y-8">
                 {posts.map(p => (
                     <li key={p.id} className="pt-8 first:pt-0 space-y-4">
-                        <h2 className="font-semibold text-2xl">{p.title}</h2>
+                        <div className="flex items-center gap-2">
+                            {profiles[p.uid]?.avatarUrl && (
+                                <img src={profiles[p.uid]!.avatarUrl!} alt="author" className="w-6 h-6 rounded-full" />
+                            )}
+                            <h2 className="font-semibold text-2xl">{p.title}</h2>
+                        </div>
                         {p.imageUrl && <img src={p.imageUrl} alt="post" className="w-full rounded" />}
                         <p className="whitespace-pre-wrap leading-relaxed">{p.content}</p>
-                        <p className="text-sm text-gray-500">{safeDate(p.created as Timestamp | null)}</p>
+                        <p className="text-sm text-gray-400">{safeDate(p.created as Timestamp | null)}</p>
                     </li>
                 ))}
             </ul>

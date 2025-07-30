@@ -1,7 +1,9 @@
 "use client";
 import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase";
+import { auth, firestore, storage } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -10,12 +12,25 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [avatar, setAvatar] = useState<File | null>(null);
 
   const register = async () => {
     setError(null);
     if (!email || !password) return;
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = cred.user.uid;
+
+      let avatarUrl: string | null = null;
+      if (avatar) {
+        const clean = avatar.name.replace(/\s+/g, "-").toLowerCase();
+        const path = `avatars/${uid}/${Date.now()}-${clean}`;
+        const storageRef = ref(storage, path);
+        await uploadBytes(storageRef, avatar);
+        avatarUrl = await getDownloadURL(storageRef);
+      }
+
+      await setDoc(doc(firestore, "users", uid), { email, avatarUrl });
       router.push("/");
     } catch (err) {
       setError((err as Error).message);
@@ -39,9 +54,15 @@ export default function RegisterPage() {
         placeholder="Password"
         className="w-full p-2 border"
       />
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => setAvatar(e.target.files?.[0] || null)}
+        className="w-full p-2 border"
+      />
       <button
         onClick={register}
-        className="bg-black text-white w-full py-2"
+        className="bg-[var(--accent-color)] text-white w-full py-2"
       >
         Register
       </button>

@@ -44,7 +44,7 @@ export default function AdminPage() {
       <main className="max-w-sm mx-auto px-6 py-8 space-y-6 min-h-screen flex flex-col justify-center">
         <h1 className="text-2xl font-bold text-center">Admin Panel</h1>
         <p className="text-center">Logged in as {user.email}</p>
-        <button onClick={logout} className="bg-black text-white py-2">Sign out</button>
+        <button onClick={logout} className="bg-[var(--accent-color)] text-white py-2">Sign out</button>
         <Link href="/" className="underline text-center">Back to Home</Link>
       </main>
     );
@@ -67,7 +67,7 @@ export default function AdminPage() {
         placeholder="Password"
         className="w-full p-2 border"
       />
-      <button onClick={submit} className="bg-black text-white w-full py-2">
+      <button onClick={submit} className="bg-[var(--accent-color)] text-white w-full py-2">
         {mode === "login" ? "Login" : "Register"}
       </button>
       {error && <p className="text-red-600 text-center text-sm">{error}</p>}

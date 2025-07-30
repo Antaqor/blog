@@ -9,11 +9,17 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const signIn = async () => {
+    setError(null);
     if (!email || !password) return;
-    await signInWithEmailAndPassword(auth, email, password);
-    router.push("/");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/");
+    } catch (err) {
+      setError((err as Error).message);
+    }
   };
 
   return (
@@ -39,6 +45,7 @@ export default function LoginPage() {
       >
         Login
       </button>
+      {error && <p className="text-red-600 text-center text-sm">{error}</p>}
       <p className="text-center">
         New here? <Link href="/register" className="underline">Register</Link>
       </p>

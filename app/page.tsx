@@ -109,7 +109,9 @@ export default function Home() {
         } finally { setSubmitting(false); }
     }, [canSubmit, image, title, content, user]);
 
-    const signOutUser = useCallback(() => signOut(auth), []);
+    const signOutUser = useCallback(async () => {
+        try { await signOut(auth); } catch (err) { console.error(err); }
+    }, []);
 
     return (
         <main className="max-w-xl mx-auto p-4 space-y-4">
@@ -125,8 +127,17 @@ export default function Home() {
                 <form onSubmit={addPost} className="space-y-2">
                     <input className="w-full p-2 border" value={title} onChange={e=>setTitle(e.target.value)} placeholder="Title" maxLength={120} />
                     <textarea className="w-full p-2 border" value={content} onChange={e=>setContent(e.target.value)} rows={6} placeholder="Content" />
-                    <input className="w-full p-2 border" type="file" accept="image/*" onChange={e=>setImage(e.target.files?.[0] || null)} />
-                    {submitting && image && <div className="text-sm text-gray-400">{progress}%</div>}
+                    <input
+                        className="w-full p-2 border"
+                        type="file" accept="image/*"
+                        onChange={e => setImage(e.target.files?.[0] || null)}
+                    />
+                    {image && (
+                        <img src={URL.createObjectURL(image)} alt="preview" className="max-h-48 object-contain" />
+                    )}
+                    {submitting && image && (
+                        <progress value={progress} max={100} className="w-full">{progress}%</progress>
+                    )}
                     <div className="flex items-center gap-2">
                         <button disabled={!canSubmit} className={`px-4 py-2 text-white ${canSubmit ? "bg-black" : "bg-gray-400 cursor-not-allowed"}`}>
                             {submitting ? "Adding..." : "Add Post"}

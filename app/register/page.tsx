@@ -9,11 +9,17 @@ export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const register = async () => {
+    setError(null);
     if (!email || !password) return;
-    await createUserWithEmailAndPassword(auth, email, password);
-    router.push("/");
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      router.push("/");
+    } catch (err) {
+      setError((err as Error).message);
+    }
   };
 
   return (
@@ -39,6 +45,7 @@ export default function RegisterPage() {
       >
         Register
       </button>
+      {error && <p className="text-red-600 text-center text-sm">{error}</p>}
       <p className="text-center">
         Already have an account? <Link href="/login" className="underline">Login</Link>
       </p>

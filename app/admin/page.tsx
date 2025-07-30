@@ -15,20 +15,26 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"login" | "register">("login");
   const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     return onAuthStateChanged(auth, setUser);
   }, []);
 
   const submit = async () => {
+    setError(null);
     if (!email || !password) return;
-    if (mode === "login") {
-      await signInWithEmailAndPassword(auth, email, password);
-    } else {
-      await createUserWithEmailAndPassword(auth, email, password);
+    try {
+      if (mode === "login") {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+      setError((err as Error).message);
     }
-    setEmail("");
-    setPassword("");
   };
 
   const logout = () => signOut(auth);
@@ -64,6 +70,7 @@ export default function AdminPage() {
       <button onClick={submit} className="bg-black text-white w-full py-2">
         {mode === "login" ? "Login" : "Register"}
       </button>
+      {error && <p className="text-red-600 text-center text-sm">{error}</p>}
       <p className="text-center">
         {mode === "login" ? (
           <>New here? <button onClick={() => setMode("register") } className="underline">Register</button></>

@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5985442f-88f5-4593-8138-bf539d2864c4" name="Changes" comment="">
+    <list default="true" id="5985442f-88f5-4593-8138-bf539d2864c4" name="Changes" comment="gitp">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/firebase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/firebase.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,11 +56,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1753854261433</updated>
-      <workItem from="1753854262629" duration="2616000" />
+      <workItem from="1753854262629" duration="5792000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="gitp" />
+    <option name="LAST_COMMIT_MESSAGE" value="gitp" />
   </component>
 </project>

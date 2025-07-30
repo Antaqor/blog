@@ -8,7 +8,8 @@ const firebaseConfig = {
   apiKey: "AIzaSyBsd8CmzMA4U_p3B5Bimpyne4gRHmHlGR8",
   authDomain: "yuki-906f3.firebaseapp.com",
   projectId: "yuki-906f3",
-  storageBucket: "yuki-906f3.firebasestorage.app",
+  // Correct the storage bucket domain
+  storageBucket: "yuki-906f3.appspot.com",
   messagingSenderId: "91239365480",
   appId: "1:91239365480:web:2ad7d59ebe48941a9874dd",
   measurementId: "G-PJ6JKLKMQC",

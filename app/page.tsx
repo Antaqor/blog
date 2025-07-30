@@ -9,6 +9,7 @@ import {
   query,
   orderBy,
   Timestamp,
+  serverTimestamp,
   DocumentData,
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
@@ -36,14 +37,19 @@ export default function Home() {
 
   const addPost = async () => {
     if (!title || !content || !user) return;
-    await addDoc(collection(firestore, "posts"), {
-      title,
-      content,
-      created: Timestamp.now(),
-      uid: user.uid,
-    });
-    setTitle("");
-    setContent("");
+    try {
+      await addDoc(collection(firestore, "posts"), {
+        title,
+        content,
+        // Use Firestore server time to avoid client clock issues
+        created: serverTimestamp(),
+        uid: user.uid,
+      });
+      setTitle("");
+      setContent("");
+    } catch (err) {
+      console.error("Failed to add post", err);
+    }
   };
 
   const signOutUser = () => signOut(auth);

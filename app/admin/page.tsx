@@ -41,8 +41,8 @@ export default function AdminPage() {
 
   if (user) {
     return (
-      <main className="max-w-sm mx-auto p-4 bg-white text-black space-y-4 min-h-screen flex flex-col justify-center">
-        <h1 className="text-xl font-bold text-center">Admin Panel</h1>
+      <main className="max-w-sm mx-auto px-6 py-8 space-y-6 min-h-screen flex flex-col justify-center">
+        <h1 className="text-2xl font-bold text-center">Admin Panel</h1>
         <p className="text-center">Logged in as {user.email}</p>
         <button onClick={logout} className="bg-black text-white py-2">Sign out</button>
         <Link href="/" className="underline text-center">Back to Home</Link>
@@ -51,8 +51,8 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="max-w-sm mx-auto p-4 bg-white text-black space-y-4 min-h-screen flex flex-col justify-center">
-      <h1 className="text-xl font-bold text-center">Admin Login</h1>
+    <main className="max-w-sm mx-auto px-6 py-8 space-y-6 min-h-screen flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-center">Admin Login</h1>
       <input
         type="email"
         value={email}

@@ -23,8 +23,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="max-w-sm mx-auto p-4 space-y-4 bg-white text-black min-h-screen flex flex-col justify-center">
-      <h1 className="text-xl font-bold text-center">Register</h1>
+    <main className="max-w-sm mx-auto px-6 py-8 space-y-6 min-h-screen flex flex-col justify-center">
+      <h1 className="text-2xl font-bold text-center">Register</h1>
       <input
         type="email"
         value={email}

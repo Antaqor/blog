@@ -1,6 +1,8 @@
 // Firebase initialization
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBsd8CmzMA4U_p3B5Bimpyne4gRHmHlGR8",
@@ -14,5 +16,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const firebaseApp = initializeApp(firebaseConfig);
-export const firebaseAnalytics = typeof window !== "undefined" ? getAnalytics(firebaseApp) : undefined;
+export const firebaseAnalytics =
+  typeof window !== "undefined" ? getAnalytics(firebaseApp) : undefined;
+export const firestore = getFirestore(firebaseApp);
+export const auth = getAuth(firebaseApp);
 

@@ -39,10 +39,10 @@ export default function LoginPage() {
         placeholder="Password"
         className="w-full p-2 border"
       />
-      <button
-        onClick={signIn}
-        className="bg-black text-white w-full py-2"
-      >
+        <button
+          onClick={signIn}
+          className="bg-[var(--accent-color)] text-white w-full py-2"
+        >
         Login
       </button>
       {error && <p className="text-red-600 text-center text-sm">{error}</p>}

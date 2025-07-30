@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
+:root {
+  --accent-color: #1400FF;
+}
+
 body {
-  background: #ffffff;
-  color: #000000;
+  background: #000000;
+  color: #ffffff;
   font-family: var(--font-geist-sans, Arial, Helvetica, sans-serif);
 }
 
@@ -16,5 +20,6 @@ h6 {
 }
 
 a {
+  color: var(--accent-color);
   text-decoration: underline;
 }

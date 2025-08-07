@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, FormEvent } from "react";
 import Link from "next/link";
-import { firestore, auth } from "@/firebase";
+import { firestore, auth, storage } from "@/firebase";
 import {
   collection,
   addDoc,
@@ -15,6 +15,7 @@ import {
   QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // --- Types ---
 type ServerTimestamp = ReturnType<typeof serverTimestamp>;
@@ -24,6 +25,7 @@ type PostDoc = {
   content: string;
   created: Timestamp | ServerTimestamp; // write: serverTimestamp(), read: Timestamp
   uid: string;
+  imageUrl?: string;
 };
 
 type Post = PostDoc & { id: string };
@@ -47,6 +49,7 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,15 +91,26 @@ export default function Home() {
 
         try {
           const postsCol = collection(firestore, POSTS_COLLECTION).withConverter(postConverter);
+          let imageUrl: string | undefined;
+          if (image) {
+            const imageRef = ref(
+                storage,
+                `posts/${user!.uid}/${Date.now()}-${image.name}`
+            );
+            await uploadBytes(imageRef, image);
+            imageUrl = await getDownloadURL(imageRef);
+          }
           const payload: PostDoc = {
             title: title.trim(),
             content: content.trim(),
             created: serverTimestamp(),
             uid: user!.uid,
+            ...(imageUrl ? { imageUrl } : {}),
           };
           await addDoc(postsCol, payload);
           setTitle("");
           setContent("");
+          setImage(null);
         } catch (err) {
           console.error(err);
           setError("Failed to add post.");
@@ -104,7 +118,7 @@ export default function Home() {
           setSubmitting(false);
         }
       },
-      [canSubmit, title, content, user]
+      [canSubmit, title, content, image, user]
   );
 
   const signOutUser = useCallback(() => signOut(auth), []);
@@ -137,6 +151,13 @@ export default function Home() {
                   className="w-full p-2 border"
                   aria-label="Title"
               />
+              <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImage(e.target.files?.[0] || null)}
+                  className="w-full"
+                  aria-label="Image"
+              />
               <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
@@ -163,6 +184,13 @@ export default function Home() {
               <li key={post.id} className="border p-2 rounded">
                 <h2 className="font-semibold text-lg">{post.title}</h2>
                 <p className="whitespace-pre-wrap">{post.content}</p>
+                {post.imageUrl && (
+                    <img
+                        src={post.imageUrl}
+                        alt={post.title}
+                        className="my-2 max-w-full"
+                    />
+                )}
                 <p className="text-sm text-gray-500">{safeDate(post.created as Timestamp | null)}</p>
               </li>
           ))}
